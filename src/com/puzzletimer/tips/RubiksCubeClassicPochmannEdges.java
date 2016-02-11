@@ -31,6 +31,7 @@ public class RubiksCubeClassicPochmannEdges implements Tip {
     @Override
     public String getTip(Scramble scramble) {
         ThreeBldCube analyze = new ThreeBldCube(scramble.getRawSequence());
+        analyze.setEdgeBuffer("B");
 
         String[] pureTargets = analyze.getEdgePairs(false).replaceAll("\\s+?", "").split("");
         String[] flippedEdges = analyze.getFlippedEdgeSingleTargetPairs().replaceAll("\\s+?", "").split("");
