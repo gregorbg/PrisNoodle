@@ -57,7 +57,7 @@ public class Main {
         File databaseFile = new File("puzzletimerWCA.mv.db");
         if (!databaseFile.exists()) {
             try {
-                Connection connection = DriverManager.getConnection("jdbc:h2:./puzzletimerWCA");
+                Connection connection = DriverManager.getConnection("jdbc:h2:." + File.separator + "puzzletimerWCA");
                 Reader script = new InputStreamReader(
                         getClass().getResourceAsStream("/com/puzzletimer/resources/database/puzzletimerWCA.sql"));
                 RunScript.execute(connection, script);
@@ -77,7 +77,7 @@ public class Main {
         // connect to database
         Connection connection = null;
         try {
-            connection = DriverManager.getConnection("jdbc:h2:./puzzletimerWCA;IFEXISTS=TRUE");
+            connection = DriverManager.getConnection("jdbc:h2:." + File.separator + "puzzletimerWCA;IFEXISTS=TRUE");
         } catch (SQLException e) {
             e.printStackTrace();
             JFrame frame = new JFrame();
