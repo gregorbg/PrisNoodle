@@ -12,6 +12,10 @@ public class WcaCategory implements Category {
     private final boolean bld;
     private final boolean isCustom;
 
+    public WcaCategory(UUID categoryId, String scramblerId, String description, String[] tipIds, char mnemonic, char accelerator, boolean isCustom) {
+        this(categoryId, scramblerId, description, tipIds, mnemonic, accelerator, false, false, isCustom);
+    }
+
     public WcaCategory(UUID categoryId, String scramblerId, String description, String[] tipIds, char mnemonic, char accelerator, boolean isBld, boolean isCustom) {
         this(categoryId, scramblerId, description, tipIds, mnemonic, accelerator, false, isBld, isCustom);
     }
