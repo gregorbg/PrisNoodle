@@ -22,13 +22,14 @@ public class CategoryDAO {
             Statement categoryStatement = this.connection.createStatement();
 
             ResultSet categoryResultSet = categoryStatement.executeQuery(
-                "SELECT CATEGORY_ID, SCRAMBLER_ID, DESCRIPTION FROM CATEGORY " +
+                "SELECT CATEGORY_ID, SCRAMBLER_ID, DESCRIPTION, FORCE_START FROM CATEGORY " +
                 "ORDER BY \"ORDER\"");
 
             while (categoryResultSet.next()) {
                 UUID categoryId = UUID.fromString(categoryResultSet.getString(1));
                 String scramblerId = categoryResultSet.getString(2);
                 String description = categoryResultSet.getString(3);
+                boolean forceStart = categoryResultSet.getBoolean(4);
 
                 // tips
                 PreparedStatement tipsStatement = this.connection.prepareStatement(
@@ -56,6 +57,7 @@ public class CategoryDAO {
                         tipIdsArray,
                         '0',
                         '0',
+                        forceStart,
                         true));
             }
 
@@ -76,12 +78,13 @@ public class CategoryDAO {
 
             // category
             PreparedStatement categoryStatement = this.connection.prepareStatement(
-                "INSERT INTO CATEGORY VALUES (?, ?, ?, ?)");
+                "INSERT INTO CATEGORY VALUES (?, ?, ?, ?, ?)");
 
             categoryStatement.setInt(1, 0);
             categoryStatement.setString(2, category.getCategoryId().toString());
             categoryStatement.setString(3, category.getScramblerId());
             categoryStatement.setString(4, category.getDescription());
+            categoryStatement.setBoolean(5, category.isBldMode());
 
             categoryStatement.executeUpdate();
 
@@ -127,12 +130,13 @@ public class CategoryDAO {
 
             // category
             PreparedStatement categoryStatement = this.connection.prepareStatement(
-                "UPDATE CATEGORY SET SCRAMBLER_ID = ?, DESCRIPTION = ? " +
+                "UPDATE CATEGORY SET SCRAMBLER_ID = ?, DESCRIPTION = ?, FORCE_START = ? " +
                 "WHERE CATEGORY_ID = ?");
 
             categoryStatement.setString(1, category.getScramblerId());
             categoryStatement.setString(2, category.getDescription());
-            categoryStatement.setString(3, category.getCategoryId().toString());
+            categoryStatement.setBoolean(3, category.isBldMode());
+            categoryStatement.setString(4, category.getCategoryId().toString());
 
             categoryStatement.executeUpdate();
 
