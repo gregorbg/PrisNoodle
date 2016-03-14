@@ -171,6 +171,7 @@ public class MainFrame extends JFrame {
                     TimerPanel.this.timeLabel.setForeground(Color.BLACK);
                     TimerPanel.this.timeLabel.setText(
                             SolutionUtils.formatMinutes(TimerPanel.this.time, false));
+                    TimerPanel.this.timeLabel.revalidate();
                 }
 
                 @Override
