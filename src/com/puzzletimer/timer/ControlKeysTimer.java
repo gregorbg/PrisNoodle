@@ -40,8 +40,7 @@ public class ControlKeysTimer implements Timer {
         this.repeater = null;
         this.start = null;
         this.finish = new Date(0);
-        this.state = ControlKeysTimer.this.inspectionEnabled ?
-            State.READY_FOR_INSPECTION : State.NOT_READY;
+        this.state = State.NOT_READY;
     }
 
     @Override

@@ -2,8 +2,10 @@ package com.puzzletimer.tips;
 
 import com.puzzletimer.models.Scramble;
 import com.puzzletimer.puzzles.Puzzle;
-import com.puzzletimer.solvers.RubiksCubeSolver.State;
-import com.suushiemaniac.bld.analyze.ThreeBldCube;
+import com.suushiemaniac.cubing.bld.analyze.BldPuzzle;
+import com.suushiemaniac.cubing.bld.analyze.ThreeBldCube;
+import com.suushiemaniac.cubing.bld.model.enumeration.piece.CubicPieceType;
+import com.suushiemaniac.cubing.bld.model.enumeration.puzzle.CubicPuzzle;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,14 +32,15 @@ public class RubiksCubeM2Edges implements Tip {
 
     @Override
     public String getTip(Scramble scramble) {
-        ThreeBldCube analyze = new ThreeBldCube(scramble.getRawSequence());
+        BldPuzzle analyze = new ThreeBldCube(scramble.parseFor(CubicPuzzle.THREE_BLD));
 
-        String[] pureTargets = analyze.getEdgePairs(false).replaceAll("\\s+?", "").split("");
-        String[] flippedEdges = analyze.getFlippedEdgeSingleTargetPairs().replaceAll("\\s+?", "").split("");
+        String[] pureTargets = analyze.getSolutionPairs(CubicPieceType.EDGE).replaceAll("\\s+?", "").split("");
+        // TODO
+        String[] flippedEdges = analyze.getSolutionPairs(CubicPieceType.EDGE).replaceAll("\\s+?", "").split("");
 
         List<String> stickerSequence = new ArrayList<>();
-        if (analyze.getEdgeLength() > 0) stickerSequence.addAll(Arrays.asList(pureTargets));
-        if (analyze.getNumPreFlippedEdges() > 0) stickerSequence.addAll(Arrays.asList(flippedEdges));
+        if (analyze.getStatLength(CubicPieceType.EDGE) > 0) stickerSequence.addAll(Arrays.asList(pureTargets));
+        if (analyze.getMisOrientedCount(CubicPieceType.EDGE) > 0) stickerSequence.addAll(Arrays.asList(flippedEdges));
 
         // solution
         StringBuilder tip = new StringBuilder();

@@ -2,8 +2,10 @@ package com.puzzletimer.tips;
 
 import com.puzzletimer.models.Scramble;
 import com.puzzletimer.puzzles.Puzzle;
-import com.puzzletimer.solvers.RubiksCubeSolver.State;
-import com.suushiemaniac.bld.analyze.ThreeBldCube;
+import com.suushiemaniac.cubing.bld.analyze.BldPuzzle;
+import com.suushiemaniac.cubing.bld.analyze.ThreeBldCube;
+import com.suushiemaniac.cubing.bld.model.enumeration.piece.CubicPieceType;
+import com.suushiemaniac.cubing.bld.model.enumeration.puzzle.CubicPuzzle;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,16 +32,17 @@ public class RubiksCubeClassicPochmannCorners implements Tip {
 
     @Override
     public String getTip(Scramble scramble) {
-        ThreeBldCube analyze = new ThreeBldCube(scramble.getRawSequence());
+        BldPuzzle analyze = new ThreeBldCube(scramble.parseFor(CubicPuzzle.THREE_BLD));
 
-        String[] pureTargets = analyze.getCornerPairs(false).replaceAll("\\s+?", "").split("");
-        String[] cwCorners = analyze.getCwCornerSingleTargetPairs().replaceAll("\\s+?", "").split("");
-        String[] ccwCorners = analyze.getCcwCornerSingleTargetPairs().replaceAll("\\s+?", "").split("");
+        String[] pureTargets = analyze.getSolutionPairs(CubicPieceType.CORNER).replaceAll("\\s+?", "").split("");
+        // TODO
+        String[] cwCorners = analyze.getSolutionPairs(CubicPieceType.CORNER).replaceAll("\\s+?", "").split("");
+        String[] ccwCorners = analyze.getSolutionPairs(CubicPieceType.CORNER).replaceAll("\\s+?", "").split("");
 
         List<String> stickerSequence = new ArrayList<>();
-        if (analyze.getCornerLength() > 0) stickerSequence.addAll(Arrays.asList(pureTargets));
-        if (analyze.getNumPreCWCorners() > 0) stickerSequence.addAll(Arrays.asList(cwCorners));
-        if (analyze.getNumPreCCWCorners() > 0) stickerSequence.addAll(Arrays.asList(ccwCorners));
+        if (analyze.getStatLength(CubicPieceType.CORNER) > 0) stickerSequence.addAll(Arrays.asList(pureTargets));
+        if (analyze.getMisOrientedCount(CubicPieceType.CORNER, 1) > 0) stickerSequence.addAll(Arrays.asList(cwCorners));
+        if (analyze.getMisOrientedCount(CubicPieceType.CORNER, 2) > 0) stickerSequence.addAll(Arrays.asList(ccwCorners));
 
         // solution
         StringBuilder tip = new StringBuilder();
