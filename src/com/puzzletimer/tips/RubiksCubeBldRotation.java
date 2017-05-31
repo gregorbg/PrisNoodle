@@ -2,7 +2,9 @@ package com.puzzletimer.tips;
 
 import com.puzzletimer.models.Scramble;
 import com.puzzletimer.puzzles.Puzzle;
-import com.suushiemaniac.bld.analyze.ThreeBldCube;
+import com.suushiemaniac.cubing.bld.analyze.BldPuzzle;
+import com.suushiemaniac.cubing.bld.analyze.ThreeBldCube;
+import com.suushiemaniac.cubing.bld.model.enumeration.puzzle.CubicPuzzle;
 
 import static com.puzzletimer.Internationalization.i18n;
 
@@ -24,7 +26,7 @@ public class RubiksCubeBldRotation implements Tip {
 
     @Override
     public String getTip(Scramble scramble) {
-        ThreeBldCube analyze = new ThreeBldCube(scramble.getRawSequence());
+        BldPuzzle analyze = new ThreeBldCube(CubicPuzzle.THREE_BLD.getReader().parse(scramble.getRawSequence()));
 
         return this.getTipDescription() + ":\n" +
                 analyze.getRotations();

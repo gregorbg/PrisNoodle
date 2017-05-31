@@ -35,8 +35,7 @@ public class SpaceKeyTimer implements Timer {
         this.repeater = null;
         this.start = null;
         this.finish = new Date(0);
-        this.state = this.inspectionEnabled ?
-                State.READY_FOR_INSPECTION : State.READY;
+        this.state = State.READY;
     }
 
     @Override
@@ -70,18 +69,17 @@ public class SpaceKeyTimer implements Timer {
             public void keyPressed(KeyEvent keyEvent) {
                 if (keyEvent.getKeyCode() != KeyEvent.VK_SPACE && SpaceKeyTimer.this.state != State.RUNNING) return;
 
-                switch (SpaceKeyTimer.this.state) {
-                    case RUNNING:
-                        SpaceKeyTimer.this.finish = new Date();
-                        if (SpaceKeyTimer.this.finish.getTime() - SpaceKeyTimer.this.start.getTime() < 250) break;
+                if (SpaceKeyTimer.this.state == State.RUNNING) {
+                    SpaceKeyTimer.this.finish = new Date();
 
+                    if (SpaceKeyTimer.this.finish.getTime() - SpaceKeyTimer.this.start.getTime() >= 250) {
                         SpaceKeyTimer.this.repeater.cancel();
 
                         SpaceKeyTimer.this.timerManager.finishSolution(
                                 new Timing(SpaceKeyTimer.this.start, SpaceKeyTimer.this.finish));
 
                         SpaceKeyTimer.this.state = State.FINISHED;
-                        break;
+                    }
                 }
 
                 SpaceKeyTimer.this.timerManager.pressLeftHand();
