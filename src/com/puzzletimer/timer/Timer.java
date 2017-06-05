@@ -5,6 +5,8 @@ public interface Timer {
 
     void setInspectionEnabled(boolean inspectionEnabled);
 
+    void setMemoSplitEnabled(boolean memoSplitEnabled);
+
     void setSmoothTimingEnabled(boolean smoothTimingEnabled);
 
     void start();

@@ -160,6 +160,7 @@ public class Main {
                 Main.this.configurationManager.setConfiguration("CURRENT-CATEGORY", newCategory.getCategoryId().toString());
 
                 Main.this.timerManager.getTimer().setInspectionEnabled(Main.this.timerManager.isInspectionEnabled() && !newCategory.isBldMode());
+                Main.this.timerManager.getTimer().setMemoSplitEnabled(Main.this.timerManager.isMemoSplitEnabled() && newCategory.isBldMode());
 
                 try {
                     Main.this.solutionManager.loadSolutions(
@@ -209,6 +210,7 @@ public class Main {
         // timer manager
         this.timerManager = new TimerManager();
         this.timerManager.setInspectionEnabled(this.configurationManager.getBooleanConfiguration("INSPECTION-TIME-ENABLED"), this.categoryManager.getCurrentCategory().isBldMode());
+        this.timerManager.setMemoSplitEnabled(this.configurationManager.getBooleanConfiguration("MEMO-SPLIT-ENABLED"));
         this.timerManager.setSmoothTimingEnabled(this.configurationManager.getBooleanConfiguration("SMOOTH-TIMING-ENABLED"));
         this.timerManager.addListener(new TimerManager.Listener() {
             @Override
@@ -276,6 +278,12 @@ public class Main {
             public void inspectionEnabledSet(boolean inspectionEnabled) {
                 Main.this.configurationManager.setBooleanConfiguration(
                         "INSPECTION-TIME-ENABLED", inspectionEnabled);
+            }
+
+            @Override
+            public void memoSplitEnabledSet(boolean memoSplitEnabled) {
+                Main.this.configurationManager.setBooleanConfiguration(
+                        "MEMO-SPLIT-ENABLED", memoSplitEnabled);
             }
 
             @Override

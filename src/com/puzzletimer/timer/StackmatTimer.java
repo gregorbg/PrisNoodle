@@ -6,8 +6,11 @@ import com.puzzletimer.managers.TimerManager;
 import com.puzzletimer.models.Timing;
 
 import javax.sound.sampled.TargetDataLine;
-import java.util.Date;
-import java.util.TimerTask;
+import javax.swing.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.*;
 
 public class StackmatTimer implements StackmatTimerReader.StackmatTimerReaderListener, Timer {
     private enum State {
@@ -18,24 +21,35 @@ public class StackmatTimer implements StackmatTimerReader.StackmatTimerReaderLis
         RUNNING,
     }
 
+    private JFrame frame;
     private StackmatTimerReader stackmatTimerReader;
     private TimerManager timerManager;
     private boolean smoothTimingEnabled;
     private boolean inspectionEnabled;
+    private KeyListener keyListener;
     private TimerManager.Listener timerListener;
     private java.util.Timer repeater;
     private Date start;
+    private Date end;
+    private List<Date> phaseStamps;
     private State state;
     private long previousTime;
+    private int phase;
+    private int phaseTotal;
 
-    public StackmatTimer(TargetDataLine targetDataLine, TimerManager timerManager) {
-        this.stackmatTimerReader = new StackmatTimerReader(targetDataLine, timerManager);
+    public StackmatTimer(JFrame frame, TargetDataLine targetDataLine, TimerManager timerManager) {
+        this.frame = frame;
+    	this.stackmatTimerReader = new StackmatTimerReader(targetDataLine, timerManager);
         this.timerManager = timerManager;
         this.smoothTimingEnabled = true;
         this.inspectionEnabled = false;
         this.start = null;
+        this.end = new Date(0);
+        this.phaseStamps = new ArrayList<>();
         this.state = State.NOT_READY;
         this.previousTime = -1;
+        this.phase = 0;
+        this.phaseTotal = 1;
     }
 
     @Override
@@ -59,12 +73,40 @@ public class StackmatTimer implements StackmatTimerReader.StackmatTimerReaderLis
     }
 
     @Override
+    public void setMemoSplitEnabled(boolean memoSplitEnabled) {
+        this.phaseTotal = memoSplitEnabled ? 2 : 1;
+
+        this.phase = 0;
+        this.phaseStamps.clear();
+    }
+
+    @Override
     public void setSmoothTimingEnabled(boolean smoothTimingEnabled) {
         this.smoothTimingEnabled = smoothTimingEnabled;
     }
 
     @Override
     public void start() {
+    	this.keyListener = new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent keyEvent) {
+				if (keyEvent.getKeyCode() != KeyEvent.VK_SPACE && StackmatTimer.this.state != State.RUNNING) return;
+
+				if (StackmatTimer.this.state == State.RUNNING) {
+					Date finish = new Date();
+
+					if (finish.getTime() - StackmatTimer.this.start.getTime() >= 350) {
+						StackmatTimer.this.phase++;
+
+						if (StackmatTimer.this.phase < StackmatTimer.this.phaseTotal) {
+							StackmatTimer.this.phaseStamps.add(finish);
+						}
+					}
+				}
+			}
+		};
+    	this.frame.addKeyListener(this.keyListener);
+
         this.timerListener = new TimerManager.Listener() {
             @Override
             public void inspectionFinished() {
@@ -90,6 +132,7 @@ public class StackmatTimer implements StackmatTimerReader.StackmatTimerReaderLis
 
     @Override
     public void stop() {
+    	this.frame.removeKeyListener(this.keyListener);
         this.timerManager.removeListener(this.timerListener);
 
         this.stackmatTimerReader.removeEventListener(this);
@@ -119,11 +162,10 @@ public class StackmatTimer implements StackmatTimerReader.StackmatTimerReaderLis
             time = 60000 * minutes + 1000 * seconds + 10 * centiseconds;
         }
 
-        Date end = new Date();
-        Date start = new Date(end.getTime() - time);
-        Timing timing = new Timing(start, end);
+        this.end = new Date();
+        this.start = new Date(this.end.getTime() - time);
 
-        this.start = start;
+        Timing timing = new Timing(this.start, this.end, this.phaseStamps);
 
         // state transitions
         switch (this.state) {
@@ -135,6 +177,7 @@ public class StackmatTimer implements StackmatTimerReader.StackmatTimerReaderLis
                     this.timerManager.resetTimer();
                     this.state = this.inspectionEnabled ? State.RESET_FOR_INSPECTION : State.RESET;
                 }
+
                 break;
 
             case RESET_FOR_INSPECTION:
@@ -143,6 +186,7 @@ public class StackmatTimer implements StackmatTimerReader.StackmatTimerReaderLis
                     this.timerManager.startInspection();
                     this.state = State.RESET;
                 }
+
                 break;
 
             case RESET:
@@ -156,6 +200,7 @@ public class StackmatTimer implements StackmatTimerReader.StackmatTimerReaderLis
                     this.timerManager.startSolution();
                     this.state = State.RUNNING;
                 }
+
                 break;
 
             case READY:
@@ -166,6 +211,7 @@ public class StackmatTimer implements StackmatTimerReader.StackmatTimerReaderLis
                     this.timerManager.startSolution();
                     this.state = State.RUNNING;
                 }
+
                 break;
 
             case RUNNING:
@@ -178,6 +224,9 @@ public class StackmatTimer implements StackmatTimerReader.StackmatTimerReaderLis
                 if (data[0] == 'S' || time == previousTime) {
                     this.state = State.NOT_READY;
                     this.timerManager.finishSolution(timing);
+
+                    this.phase = 0;
+                    this.phaseStamps.clear();
                 }
 
                 break;

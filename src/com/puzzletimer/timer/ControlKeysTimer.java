@@ -7,7 +7,9 @@ import javax.swing.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.TimerTask;
 
 public class ControlKeysTimer implements Timer {
@@ -29,7 +31,10 @@ public class ControlKeysTimer implements Timer {
     private java.util.Timer repeater;
     private Date start;
     private Date finish;
+    private List<Date> phaseStamps;
     private State state;
+    private int phase;
+    private int phaseTotal;
 
     public ControlKeysTimer(JFrame frame, TimerManager timerManager) {
         this.frame = frame;
@@ -40,7 +45,10 @@ public class ControlKeysTimer implements Timer {
         this.repeater = null;
         this.start = null;
         this.finish = new Date(0);
+        this.phaseStamps = new ArrayList<>();
         this.state = State.NOT_READY;
+        this.phase = 0;
+        this.phaseTotal = 1;
     }
 
     @Override
@@ -61,6 +69,14 @@ public class ControlKeysTimer implements Timer {
                 if (inspectionEnabled) this.state = State.READY_FOR_INSPECTION;
                 break;
         }
+    }
+
+    @Override
+    public void setMemoSplitEnabled(boolean memoSplitEnabled) {
+		this.phaseTotal = memoSplitEnabled ? 2 : 1;
+
+		this.phase = 0;
+		this.phaseStamps.clear();
     }
 
     @Override
@@ -99,21 +115,33 @@ public class ControlKeysTimer implements Timer {
                         if (ControlKeysTimer.this.leftPressed && ControlKeysTimer.this.rightPressed) {
                             ControlKeysTimer.this.state = State.READY;
                         }
+
                         break;
 
                     case RUNNING:
                         if (ControlKeysTimer.this.leftPressed && ControlKeysTimer.this.rightPressed) {
                             ControlKeysTimer.this.finish = new Date();
-                            if (ControlKeysTimer.this.finish.getTime() - ControlKeysTimer.this.start.getTime() < 250) {
+
+                            if (ControlKeysTimer.this.finish.getTime() - ControlKeysTimer.this.start.getTime() < 350) {
                                 break;
                             }
 
-                            ControlKeysTimer.this.repeater.cancel();
+                            ControlKeysTimer.this.phase++;
 
-                            ControlKeysTimer.this.timerManager.finishSolution(
-                                new Timing(ControlKeysTimer.this.start, ControlKeysTimer.this.finish));
+                            if (ControlKeysTimer.this.phase == ControlKeysTimer.this.phaseTotal) {
+								ControlKeysTimer.this.repeater.cancel();
 
-                            ControlKeysTimer.this.state = State.FINISHED;
+								ControlKeysTimer.this.timerManager.finishSolution(
+										new Timing(ControlKeysTimer.this.start, ControlKeysTimer.this.finish, ControlKeysTimer.this.phaseStamps)
+								);
+
+								ControlKeysTimer.this.phase = 0;
+								ControlKeysTimer.this.phaseStamps.clear();
+
+								ControlKeysTimer.this.state = State.FINISHED;
+							} else {
+                            	ControlKeysTimer.this.phaseStamps.add(ControlKeysTimer.this.finish);
+							}
                         }
                         break;
                 }

@@ -45,6 +45,10 @@ public class TimerManager {
         public void inspectionFinished() {
         }
 
+        //memo
+        public void memoSplitEnabledSet(boolean memoSplitEnabled) {
+        }
+
         // solution
         public void solutionStarted() {
         }
@@ -63,6 +67,7 @@ public class TimerManager {
     private Timer currentTimer;
     private boolean smoothTimingEnabled;
     private boolean inspectionEnabled;
+    private boolean memoSplitEnabled;
     private java.util.Timer repeater;
     private Date inspectionStart;
     private String penalty;
@@ -72,6 +77,7 @@ public class TimerManager {
         this.currentTimer = null;
         this.smoothTimingEnabled = true;
         this.inspectionEnabled = false;
+        this.memoSplitEnabled = false;
         this.repeater = null;
         this.inspectionStart = null;
         this.penalty = "";
@@ -92,6 +98,7 @@ public class TimerManager {
 
         this.currentTimer = timer;
         this.currentTimer.setInspectionEnabled(this.inspectionEnabled && !forceStart);
+        this.currentTimer.setMemoSplitEnabled(this.memoSplitEnabled);
 
         for (Listener listener : this.listeners) listener.timerChanged(timer);
 
@@ -153,6 +160,21 @@ public class TimerManager {
             this.currentTimer.setInspectionEnabled(inspectionEnabled && !forceStart);
 
         for (Listener listener : this.listeners) listener.inspectionEnabledSet(inspectionEnabled);
+    }
+
+    // memo
+
+    public boolean isMemoSplitEnabled() {
+        return this.memoSplitEnabled;
+    }
+
+    public void setMemoSplitEnabled(boolean memoSplitEnabled) {
+        this.memoSplitEnabled = memoSplitEnabled;
+
+        if (currentTimer != null)
+            this.currentTimer.setMemoSplitEnabled(memoSplitEnabled);
+
+        for (Listener listener : this.listeners) listener.memoSplitEnabledSet(memoSplitEnabled);
     }
 
     public void startInspection() {

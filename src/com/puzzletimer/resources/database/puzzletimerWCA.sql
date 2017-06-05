@@ -157,6 +157,7 @@ INSERT INTO CONFIGURATION VALUES
     ('CURRENT-CATEGORY',            '90dea358-e525-4b6c-8b2d-abfa61f02a9d'),
     ('TIMER-TRIGGER',               'KEYBOARD-TIMER-SPACE'),
     ('INSPECTION-TIME-ENABLED',     'TRUE'),
+    ('MEMO-SPLIT-ENABLED',          'FALSE'),
     ('LOOK-AND-FEEL',               ''),
     ('SMOOTH-TIMING-ENABLED',       'TRUE'),
     ('STACKMAT-TIMER-INPUT-DEVICE', '');
