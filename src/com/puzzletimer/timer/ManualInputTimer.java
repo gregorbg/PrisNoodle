@@ -1,6 +1,7 @@
 package com.puzzletimer.timer;
 
 import com.puzzletimer.managers.TimerManager;
+import com.puzzletimer.models.Solution;
 import com.puzzletimer.models.Timing;
 import com.puzzletimer.util.SolutionUtils;
 
@@ -8,9 +9,15 @@ import javax.swing.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ManualInputTimer implements Timer {
+	private static final String TIME_FORMAT = "(?:\\d{1,2})?:\\d{2}\\.\\d{2,3}";
+    private static final Pattern TIME_PATTERN = Pattern.compile("(" + TIME_FORMAT + ")\\s?(?:\\[(" + TIME_FORMAT + ")(?:/(" + TIME_FORMAT + "))*" + "\\])?");
 
     private TimerManager timerManager;
     private KeyListener keyListener;
@@ -34,19 +41,30 @@ public class ManualInputTimer implements Timer {
 
             @Override
             public void keyPressed(KeyEvent keyEvent) {
-                if (keyEvent.getKeyCode() != KeyEvent.VK_ENTER) {
-                    return;
-                }
-                ManualInputTimer.this.start = new Date();
-                long time =
-                    SolutionUtils.parseTime(
-                        ManualInputTimer.this.textFieldTime.getText());
-               Timing timing =
-                   new Timing(
-                       ManualInputTimer.this.start,
-                       new Date(ManualInputTimer.this.start.getTime() + time));
-                ManualInputTimer.this.timerManager.finishSolution(timing);
-                ManualInputTimer.this.textFieldTime.setText(null);
+			if (keyEvent.getKeyCode() == KeyEvent.VK_ENTER) {
+				ManualInputTimer.this.start = new Date();
+				Matcher matcher = TIME_PATTERN.matcher(ManualInputTimer.this.textFieldTime.getText());
+
+				if (matcher.find()) {
+					long time = SolutionUtils.parseTime(matcher.group(1));
+					List<Date> phases = new ArrayList<>();
+
+					for (int i = 2; i < matcher.groupCount(); i++) {
+						long groupTime = SolutionUtils.parseTime(matcher.group(i));
+						phases.add(new Date(ManualInputTimer.this.start.getTime() + groupTime));
+					}
+
+					Timing timing =
+							new Timing(
+									ManualInputTimer.this.start,
+									new Date(ManualInputTimer.this.start.getTime() + time),
+									phases
+							);
+
+					ManualInputTimer.this.timerManager.finishSolution(timing);
+					ManualInputTimer.this.textFieldTime.setText(null);
+				}
+			}
             }
         };
 
@@ -55,6 +73,10 @@ public class ManualInputTimer implements Timer {
 
     @Override
     public void setInspectionEnabled(boolean inspectionEnabled) {
+    }
+
+    @Override
+    public void setMemoSplitEnabled(boolean memoSplitEnabled) {
     }
 
     @Override

@@ -37,6 +37,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.puzzletimer.Internationalization.i18n;
 
@@ -273,7 +274,10 @@ public class MainFrame extends JFrame {
                 labelIndex.setFont(new Font("Tahoma", Font.BOLD, 13));
                 this.panel.add(labelIndex);
 
-                JLabel labelTime = new JLabel(SolutionUtils.formatMinutes(solutions[i].getTiming().getElapsedTime(), false));
+                String elapsed = SolutionUtils.formatMinutes(solution.getTiming().getElapsedTime(), false);
+                String phases = String.join("/", solution.getTiming().getElapsedPhases().stream().map(t -> SolutionUtils.formatMinutes(t, false)).collect(Collectors.toList()));
+                String timing = elapsed + " [" + phases + "]";
+                JLabel labelTime = new JLabel(timing.replace(" []", ""));
                 labelTime.setFont(new Font("Tahoma", Font.PLAIN, 13));
                 this.panel.add(labelTime);
 
@@ -622,6 +626,7 @@ public class MainFrame extends JFrame {
     private JMenu menuCategory;
     private JMenuItem menuItemColorScheme;
     private JCheckBoxMenuItem menuItemInspectionTime;
+    private JCheckBoxMenuItem menuItemMemoSplit;
     private JCheckBoxMenuItem menuItemSmoothTiming;
     private JMenu stackmatTimerInputDevice;
     private ButtonGroup stackmatTimerInputDeviceGroup;
@@ -880,12 +885,15 @@ public class MainFrame extends JFrame {
 
         // menuItemSmoothTiming
         this.menuItemSmoothTiming.setSelected(timerManager.isSmoothTimingEnabled());
-        this.menuItemSmoothTiming.addActionListener(e -> MainFrame.this.timerManager.setSmoothTimingEnabled(
-                MainFrame.this.menuItemSmoothTiming.isSelected()));
+        this.menuItemSmoothTiming.addActionListener(e -> MainFrame.this.timerManager.setSmoothTimingEnabled(MainFrame.this.menuItemSmoothTiming.isSelected()));
 
         // menuItemInspectionTime
         this.menuItemInspectionTime.setSelected(timerManager.isInspectionEnabled());
         this.menuItemInspectionTime.addActionListener(e -> MainFrame.this.timerManager.setInspectionEnabled(MainFrame.this.menuItemInspectionTime.isSelected(), MainFrame.this.categoryManager.getCurrentCategory().isBldMode()));
+
+		// menuItemInspectionTime
+		this.menuItemMemoSplit.setSelected(timerManager.isMemoSplitEnabled());
+		this.menuItemMemoSplit.addActionListener(e -> MainFrame.this.timerManager.setMemoSplitEnabled(MainFrame.this.menuItemMemoSplit.isSelected()));
 
         // menuItemManualInput
         this.menuItemManualInput.addActionListener(e -> setTimerTrigger("MANUAL-INPUT"));
@@ -1034,7 +1042,7 @@ public class MainFrame extends JFrame {
                         targetDataLine.open(MainFrame.this.audioFormat);
                         this.menuItemStackmatTimer.setSelected(true);
                         this.timerPanel.updateTimer(false);
-                        this.timerManager.setTimer(new StackmatTimer(targetDataLine, this.timerManager), MainFrame.this.categoryManager.getCurrentCategory().isBldMode());
+                        this.timerManager.setTimer(new StackmatTimer(this, targetDataLine, this.timerManager), MainFrame.this.categoryManager.getCurrentCategory().isBldMode());
                     } catch (LineUnavailableException e) {
                         // select the default timer
                         this.menuItemSpaceKey.setSelected(true);
@@ -1141,6 +1149,12 @@ public class MainFrame extends JFrame {
         this.menuItemInspectionTime.setMnemonic(KeyEvent.VK_I);
         this.menuItemInspectionTime.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, menuShortcutKey | KeyEvent.ALT_MASK));
         menuOptions.add(this.menuItemInspectionTime);
+
+		// menuItemMemoSplit
+		this.menuItemMemoSplit = new JCheckBoxMenuItem(i18n("main.memo_split"));
+		this.menuItemMemoSplit.setMnemonic(KeyEvent.VK_P);
+		this.menuItemMemoSplit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, menuShortcutKey | KeyEvent.ALT_MASK));
+		menuOptions.add(this.menuItemMemoSplit);
 
         // menuItemSmoothTiming
         this.menuItemSmoothTiming = new JCheckBoxMenuItem(i18n("main.smooth_timing"));
