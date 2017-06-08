@@ -212,6 +212,7 @@ public class Main {
         this.timerManager.setInspectionEnabled(this.configurationManager.getBooleanConfiguration("INSPECTION-TIME-ENABLED"));
         this.timerManager.setPhasesEnabled(this.configurationManager.getBooleanConfiguration("PHASES-ENABLED"));
         this.timerManager.setSmoothTimingEnabled(this.configurationManager.getBooleanConfiguration("SMOOTH-TIMING-ENABLED"));
+        this.timerManager.setHideRunningTime(this.configurationManager.getBooleanConfiguration("HIDE-RUNNING-TIME"));
         this.timerManager.addListener(new TimerManager.Listener() {
             @Override
             public void solutionFinished(Timing timing, String penalty) {
@@ -290,6 +291,12 @@ public class Main {
             public void smoothTimingSet(boolean smoothTimingEnabled) {
                 Main.this.configurationManager.setBooleanConfiguration(
                         "SMOOTH-TIMING-ENABLED", smoothTimingEnabled);
+            }
+
+            @Override
+            public void hideRunningTimeSet(boolean hideRunningTime) {
+                Main.this.configurationManager.setBooleanConfiguration(
+                        "HIDE-RUNNING-TIME", hideRunningTime);
             }
         });
 
