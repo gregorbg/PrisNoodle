@@ -34,6 +34,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
+import java.sql.Time;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
@@ -108,6 +109,7 @@ public class MainFrame extends JFrame {
         private JTextField textFieldTime;
         private HandImage rightHand;
         private boolean currentManualInput;
+        private boolean hideRunningTime;
         private long time;
 
         public TimerPanel(TimerManager timerManager) {
@@ -171,7 +173,10 @@ public class MainFrame extends JFrame {
                     TimerPanel.this.time = timing.getElapsedTime();
                     TimerPanel.this.timeLabel.setForeground(Color.BLACK);
                     TimerPanel.this.timeLabel.setText(
-                            SolutionUtils.formatMinutes(TimerPanel.this.time, false));
+							TimerPanel.this.hideRunningTime
+									? i18n("timer_panel.running")
+									: SolutionUtils.formatMinutes(TimerPanel.this.time, false)
+					);
                     TimerPanel.this.timeLabel.revalidate();
                 }
 
@@ -207,12 +212,13 @@ public class MainFrame extends JFrame {
             add(this.rightHand, "grow");
 
             this.currentManualInput = false;
+            this.hideRunningTime = MainFrame.this.configurationManager.getBooleanConfiguration("HIDE-RUNNING-TIME");
 
             this.updateTimer(MainFrame.this.configurationManager.getConfiguration("TIMER-TRIGGER").equals("MANUAL-INPUT"));
         }
 
         private void updateTimer(boolean manualInput) {
-            if(this.currentManualInput && !manualInput) {
+            if (this.currentManualInput && !manualInput) {
                 remove(this.textFieldTime);
                 setLayout(new MigLayout("fill", "2%[19%]1%[56%]1%[19%]2%"));
                 add(this.leftHand, "grow");
@@ -221,7 +227,7 @@ public class MainFrame extends JFrame {
                 MainFrame.this.requestFocusInWindow();
                 this.updateUI();
                 this.currentManualInput = false;
-            } else if(!this.currentManualInput && manualInput) {
+            } else if (!this.currentManualInput && manualInput) {
                 remove(this.timeLabel);
                 remove(this.leftHand);
                 remove(this.rightHand);
@@ -232,6 +238,15 @@ public class MainFrame extends JFrame {
                 this.currentManualInput = true;
             }
         }
+
+        private void setHideRunningTime(boolean hideRunningTime) {
+			this.hideRunningTime = hideRunningTime;
+			MainFrame.this.configurationManager.setBooleanConfiguration("HIDE-RUNNING-TIME", hideRunningTime);
+		}
+
+		private boolean isHideRunningTime() {
+        	return this.hideRunningTime;
+		}
     }
 
     private class TimesScrollPane extends JScrollPane {
@@ -626,6 +641,7 @@ public class MainFrame extends JFrame {
     private JMenu menuCategory;
     private JMenuItem menuItemColorScheme;
     private JCheckBoxMenuItem menuItemInspectionTime;
+    private JCheckBoxMenuItem menuItemHideRunningTime;
     private JCheckBoxMenuItem menuItemPhases;
     private JCheckBoxMenuItem menuItemSmoothTiming;
     private JMenu stackmatTimerInputDevice;
@@ -891,6 +907,11 @@ public class MainFrame extends JFrame {
         this.menuItemInspectionTime.setSelected(timerManager.isInspectionEnabled());
         this.menuItemInspectionTime.addActionListener(e -> MainFrame.this.timerManager.setInspectionEnabled(MainFrame.this.menuItemInspectionTime.isSelected()));
 
+		// menuItemHideRunningTime
+		// TODO move/delegate to timerManager
+		this.menuItemHideRunningTime.setSelected(this.timerPanel.isHideRunningTime());
+		this.menuItemHideRunningTime.addActionListener(e -> MainFrame.this.timerPanel.setHideRunningTime(MainFrame.this.menuItemHideRunningTime.isSelected()));
+
 		// menuItemInspectionTime
 		this.menuItemPhases.setSelected(timerManager.isPhasesEnabled());
 		this.menuItemPhases.addActionListener(e -> MainFrame.this.timerManager.setPhasesEnabled(MainFrame.this.menuItemPhases.isSelected()));
@@ -1151,6 +1172,12 @@ public class MainFrame extends JFrame {
         this.menuItemInspectionTime.setMnemonic(KeyEvent.VK_I);
         this.menuItemInspectionTime.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, menuShortcutKey | KeyEvent.ALT_MASK));
         menuOptions.add(this.menuItemInspectionTime);
+
+		// menuItemInspectionTime
+		this.menuItemHideRunningTime = new JCheckBoxMenuItem(i18n("main.hide_running_time"));
+		this.menuItemHideRunningTime.setMnemonic(KeyEvent.VK_H);
+		this.menuItemHideRunningTime.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, menuShortcutKey | KeyEvent.ALT_MASK));
+		menuOptions.add(this.menuItemHideRunningTime);
 
 		// menuItemPhases
 		this.menuItemPhases = new JCheckBoxMenuItem(i18n("main.phases"));
