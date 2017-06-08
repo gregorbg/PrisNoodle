@@ -46,7 +46,7 @@ public class TimerManager {
         }
 
         //memo
-        public void memoSplitEnabledSet(boolean memoSplitEnabled) {
+        public void phasesEnabledSet(boolean phasesEnabled) {
         }
 
         // solution
@@ -67,7 +67,7 @@ public class TimerManager {
     private Timer currentTimer;
     private boolean smoothTimingEnabled;
     private boolean inspectionEnabled;
-    private boolean memoSplitEnabled;
+    private boolean phasesEnabled;
     private java.util.Timer repeater;
     private Date inspectionStart;
     private String penalty;
@@ -77,7 +77,7 @@ public class TimerManager {
         this.currentTimer = null;
         this.smoothTimingEnabled = true;
         this.inspectionEnabled = false;
-        this.memoSplitEnabled = false;
+        this.phasesEnabled = false;
         this.repeater = null;
         this.inspectionStart = null;
         this.penalty = "";
@@ -86,7 +86,7 @@ public class TimerManager {
 
     // timer
 
-    public void setTimer(Timer timer, boolean forceStart) {
+    public void setTimer(Timer timer) {
         // suspend running inspection
         if (this.inspectionStart != null) {
             this.repeater.cancel();
@@ -97,8 +97,8 @@ public class TimerManager {
         if (this.currentTimer != null) this.currentTimer.stop();
 
         this.currentTimer = timer;
-        this.currentTimer.setInspectionEnabled(this.inspectionEnabled && !forceStart);
-        this.currentTimer.setMemoSplitEnabled(this.memoSplitEnabled);
+        this.currentTimer.setInspectionEnabled(this.inspectionEnabled);
+        this.currentTimer.setPhasesEnabled(this.phasesEnabled);
 
         for (Listener listener : this.listeners) listener.timerChanged(timer);
 
@@ -153,28 +153,28 @@ public class TimerManager {
         return this.inspectionEnabled;
     }
 
-    public void setInspectionEnabled(boolean inspectionEnabled, boolean forceStart) {
+    public void setInspectionEnabled(boolean inspectionEnabled) {
         this.inspectionEnabled = inspectionEnabled;
 
         if (this.currentTimer != null)
-            this.currentTimer.setInspectionEnabled(inspectionEnabled && !forceStart);
+            this.currentTimer.setInspectionEnabled(inspectionEnabled);
 
         for (Listener listener : this.listeners) listener.inspectionEnabledSet(inspectionEnabled);
     }
 
-    // memo
+    // phases
 
-    public boolean isMemoSplitEnabled() {
-        return this.memoSplitEnabled;
+    public boolean isPhasesEnabled() {
+        return this.phasesEnabled;
     }
 
-    public void setMemoSplitEnabled(boolean memoSplitEnabled) {
-        this.memoSplitEnabled = memoSplitEnabled;
+    public void setPhasesEnabled(boolean phasesEnabled) {
+        this.phasesEnabled = phasesEnabled;
 
         if (currentTimer != null)
-            this.currentTimer.setMemoSplitEnabled(memoSplitEnabled);
+            this.currentTimer.setPhasesEnabled(phasesEnabled);
 
-        for (Listener listener : this.listeners) listener.memoSplitEnabledSet(memoSplitEnabled);
+        for (Listener listener : this.listeners) listener.phasesEnabledSet(phasesEnabled);
     }
 
     public void startInspection() {

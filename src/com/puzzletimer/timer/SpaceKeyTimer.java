@@ -25,26 +25,28 @@ public class SpaceKeyTimer implements Timer {
     private JFrame frame;
     private TimerManager timerManager;
     private boolean inspectionEnabled;
+    private boolean phasesEnabled;
     private KeyListener keyListener;
     private TimerManager.Listener timerListener;
     private java.util.Timer repeater;
     private Date start;
     private Date finish;
-    private List<Date> phaseStamps;
+    private List<Date> currentPhaseStamps;
     private State state;
-    private int phase;
+    private int currentPhase;
     private int phaseTotal;
 
     public SpaceKeyTimer(JFrame frame, TimerManager timerManager) {
         this.frame = frame;
         this.timerManager = timerManager;
         this.inspectionEnabled = false;
+        this.phasesEnabled = false;
         this.repeater = null;
         this.start = null;
         this.finish = new Date(0);
-        this.phaseStamps = new ArrayList<>();
+        this.currentPhaseStamps = new ArrayList<>();
         this.state = State.READY;
-        this.phase = 0;
+        this.currentPhase = 0;
         this.phaseTotal = 1;
     }
 
@@ -69,12 +71,20 @@ public class SpaceKeyTimer implements Timer {
     }
 
 	@Override
-	public void setMemoSplitEnabled(boolean memoSplitEnabled) {
-		this.phaseTotal = memoSplitEnabled ? 2 : 1;
+	public void setPhaseTotal(int phaseTotal) {
+		this.phaseTotal = phaseTotal;
 
-    	this.phase = 0;
-		this.phaseStamps.clear();
+    	this.currentPhase = 0;
+		this.currentPhaseStamps.clear();
 	}
+
+    @Override
+    public void setPhasesEnabled(boolean phasesEnabled) {
+        this.phasesEnabled = phasesEnabled;
+
+        this.currentPhase = 0;
+        this.currentPhaseStamps.clear();
+    }
 
 	@Override
     public void setSmoothTimingEnabled(boolean smoothTimingEnabled) {
@@ -91,20 +101,20 @@ public class SpaceKeyTimer implements Timer {
 					SpaceKeyTimer.this.finish = new Date();
 
 					if (SpaceKeyTimer.this.finish.getTime() - SpaceKeyTimer.this.start.getTime() >= INTERMEDIARY_THRESHOLD) {
-						SpaceKeyTimer.this.phase++;
+						SpaceKeyTimer.this.currentPhase++;
 
-						if (SpaceKeyTimer.this.phase == SpaceKeyTimer.this.phaseTotal) {
+						if (!SpaceKeyTimer.this.phasesEnabled || SpaceKeyTimer.this.currentPhase == SpaceKeyTimer.this.phaseTotal) {
 							SpaceKeyTimer.this.repeater.cancel();
 
 							SpaceKeyTimer.this.timerManager.finishSolution(
-									new Timing(SpaceKeyTimer.this.start, SpaceKeyTimer.this.finish, SpaceKeyTimer.this.phaseStamps));
+									new Timing(SpaceKeyTimer.this.start, SpaceKeyTimer.this.finish, SpaceKeyTimer.this.currentPhaseStamps));
 
-							SpaceKeyTimer.this.phase = 0;
-							SpaceKeyTimer.this.phaseStamps.clear();
+							SpaceKeyTimer.this.currentPhase = 0;
+							SpaceKeyTimer.this.currentPhaseStamps.clear();
 
 							SpaceKeyTimer.this.state = State.FINISHED;
 						} else {
-							SpaceKeyTimer.this.phaseStamps.add(SpaceKeyTimer.this.finish);
+							SpaceKeyTimer.this.currentPhaseStamps.add(SpaceKeyTimer.this.finish);
 						}
 					}
                 }

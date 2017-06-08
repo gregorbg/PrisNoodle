@@ -104,3 +104,6 @@ crashlytics-build.properties
 # temporary testing databases
 puzzletimerWCA.mv.db
 puzzletimerWCA.trace.db
+
+# META
+src/META-INF/

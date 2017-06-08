@@ -17,15 +17,19 @@ public interface Category {
 
     Category setTipIds(String[] tipIds);
 
-    Category setBldMode(boolean bldMode);
+    Category setForceStart(boolean force);
+
+    Category setPhases(int phases);
 
     char getAccelerator();
 
     char getMnemonic();
 
+    int getPhases();
+
     boolean hasAlt();
 
-    boolean isBldMode();
+    boolean isForceStart();
 
     boolean isCustom();
 }

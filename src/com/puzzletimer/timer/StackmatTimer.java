@@ -26,15 +26,16 @@ public class StackmatTimer implements StackmatTimerReader.StackmatTimerReaderLis
     private TimerManager timerManager;
     private boolean smoothTimingEnabled;
     private boolean inspectionEnabled;
+    private boolean phasesEnabled;
     private KeyListener keyListener;
     private TimerManager.Listener timerListener;
     private java.util.Timer repeater;
     private Date start;
     private Date end;
-    private List<Date> phaseStamps;
+    private List<Date> currentPhaseStamps;
     private State state;
     private long previousTime;
-    private int phase;
+    private int currentPhase;
     private int phaseTotal;
 
     public StackmatTimer(JFrame frame, TargetDataLine targetDataLine, TimerManager timerManager) {
@@ -43,12 +44,13 @@ public class StackmatTimer implements StackmatTimerReader.StackmatTimerReaderLis
         this.timerManager = timerManager;
         this.smoothTimingEnabled = true;
         this.inspectionEnabled = false;
+        this.phasesEnabled = false;
         this.start = null;
         this.end = new Date(0);
-        this.phaseStamps = new ArrayList<>();
+        this.currentPhaseStamps = new ArrayList<>();
         this.state = State.NOT_READY;
         this.previousTime = -1;
-        this.phase = 0;
+        this.currentPhase = 0;
         this.phaseTotal = 1;
     }
 
@@ -73,11 +75,19 @@ public class StackmatTimer implements StackmatTimerReader.StackmatTimerReaderLis
     }
 
     @Override
-    public void setMemoSplitEnabled(boolean memoSplitEnabled) {
-        this.phaseTotal = memoSplitEnabled ? 2 : 1;
+    public void setPhaseTotal(int phaseTotal) {
+        this.phaseTotal = phaseTotal;
 
-        this.phase = 0;
-        this.phaseStamps.clear();
+        this.currentPhase = 0;
+        this.currentPhaseStamps.clear();
+    }
+
+    @Override
+    public void setPhasesEnabled(boolean phasesEnabled) {
+        this.phasesEnabled = phasesEnabled;
+
+        this.currentPhase = 0;
+        this.currentPhaseStamps.clear();
     }
 
     @Override
@@ -96,10 +106,10 @@ public class StackmatTimer implements StackmatTimerReader.StackmatTimerReaderLis
 					Date finish = new Date();
 
 					if (finish.getTime() - StackmatTimer.this.start.getTime() >= 350) {
-						StackmatTimer.this.phase++;
+						StackmatTimer.this.currentPhase++;
 
-						if (StackmatTimer.this.phase < StackmatTimer.this.phaseTotal) {
-							StackmatTimer.this.phaseStamps.add(finish);
+						if (StackmatTimer.this.phasesEnabled && StackmatTimer.this.currentPhase < StackmatTimer.this.phaseTotal) {
+							StackmatTimer.this.currentPhaseStamps.add(finish);
 						}
 					}
 				}
@@ -123,9 +133,9 @@ public class StackmatTimer implements StackmatTimerReader.StackmatTimerReaderLis
         this.repeater.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (StackmatTimer.this.state == State.RUNNING)
-                    if (smoothTimingEnabled) StackmatTimer.this.timerManager.updateSolutionTiming(
-                            new Timing(StackmatTimer.this.start, new Date()));
+                if (StackmatTimer.this.smoothTimingEnabled && StackmatTimer.this.state == State.RUNNING) {
+                    StackmatTimer.this.timerManager.updateSolutionTiming(new Timing(StackmatTimer.this.start, new Date()));
+                }
             }
         }, 0, 5);
     }
@@ -165,7 +175,7 @@ public class StackmatTimer implements StackmatTimerReader.StackmatTimerReaderLis
         this.end = new Date();
         this.start = new Date(this.end.getTime() - time);
 
-        Timing timing = new Timing(this.start, this.end, this.phaseStamps);
+        Timing timing = new Timing(this.start, this.end, this.currentPhaseStamps);
 
         // state transitions
         switch (this.state) {
@@ -225,8 +235,8 @@ public class StackmatTimer implements StackmatTimerReader.StackmatTimerReaderLis
                     this.state = State.NOT_READY;
                     this.timerManager.finishSolution(timing);
 
-                    this.phase = 0;
-                    this.phaseStamps.clear();
+                    this.currentPhase = 0;
+                    this.currentPhaseStamps.clear();
                 }
 
                 break;

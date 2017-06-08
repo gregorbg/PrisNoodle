@@ -1,7 +1,6 @@
 package com.puzzletimer.timer;
 
 import com.puzzletimer.managers.TimerManager;
-import com.puzzletimer.models.Solution;
 import com.puzzletimer.models.Timing;
 import com.puzzletimer.util.SolutionUtils;
 
@@ -75,8 +74,12 @@ public class ManualInputTimer implements Timer {
     public void setInspectionEnabled(boolean inspectionEnabled) {
     }
 
+	@Override
+	public void setPhasesEnabled(boolean phasesEnabled) {
+	}
+
     @Override
-    public void setMemoSplitEnabled(boolean memoSplitEnabled) {
+    public void setPhaseTotal(int phaseTotal) {
     }
 
     @Override
