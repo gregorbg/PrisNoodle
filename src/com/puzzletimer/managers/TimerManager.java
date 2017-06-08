@@ -45,9 +45,13 @@ public class TimerManager {
         public void inspectionFinished() {
         }
 
-        //memo
+        //phases
         public void phasesEnabledSet(boolean phasesEnabled) {
         }
+
+        //hide running time
+		public void hideRunningTimeSet(boolean hideRunningTime) {
+		}
 
         // solution
         public void solutionStarted() {
@@ -68,6 +72,7 @@ public class TimerManager {
     private boolean smoothTimingEnabled;
     private boolean inspectionEnabled;
     private boolean phasesEnabled;
+    private boolean hideRunningTime;
     private java.util.Timer repeater;
     private Date inspectionStart;
     private String penalty;
@@ -78,6 +83,7 @@ public class TimerManager {
         this.smoothTimingEnabled = true;
         this.inspectionEnabled = false;
         this.phasesEnabled = false;
+        this.hideRunningTime = false;
         this.repeater = null;
         this.inspectionStart = null;
         this.penalty = "";
@@ -131,6 +137,8 @@ public class TimerManager {
         this.listeners.forEach(TimerManager.Listener::rightHandReleased);
     }
 
+    // smooth timing
+
     public boolean isSmoothTimingEnabled() {
         return this.smoothTimingEnabled;
     }
@@ -138,13 +146,10 @@ public class TimerManager {
     public void setSmoothTimingEnabled(boolean smoothTimingEnabled) {
         this.smoothTimingEnabled = smoothTimingEnabled;
 
-        if (this.currentTimer != null) {
-            this.currentTimer.setSmoothTimingEnabled(smoothTimingEnabled);
-        }
+        if (this.currentTimer != null)
+        	this.currentTimer.setSmoothTimingEnabled(smoothTimingEnabled);
 
-        for (Listener listener : this.listeners) {
-            listener.smoothTimingSet(smoothTimingEnabled);
-        }
+        for (Listener listener : this.listeners) listener.smoothTimingSet(smoothTimingEnabled);
     }
 
     // inspection
@@ -176,6 +181,18 @@ public class TimerManager {
 
         for (Listener listener : this.listeners) listener.phasesEnabledSet(phasesEnabled);
     }
+
+    // running times
+
+	public boolean isHideRunningTime() {
+    	return this.hideRunningTime;
+	}
+
+	public void setHideRunningTime(boolean hideRunningTime) {
+    	this.hideRunningTime = hideRunningTime;
+
+    	for (Listener listener : this.listeners) listener.hideRunningTimeSet(hideRunningTime);
+	}
 
     public void startInspection() {
         TimerManager.this.listeners.forEach(TimerManager.Listener::inspectionStarted);

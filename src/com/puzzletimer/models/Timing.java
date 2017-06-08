@@ -1,5 +1,7 @@
 package com.puzzletimer.models;
 
+import com.puzzletimer.util.SolutionUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -49,4 +51,12 @@ public class Timing {
 				.map(d -> d.getTime() - this.start.getTime())
 				.collect(Collectors.toList());
 	}
+
+	public String toFormatString() {
+        String elapsed = SolutionUtils.formatMinutes(this.getElapsedTime(), false);
+        String phases = String.join("/", this.getElapsedPhases().stream().map(t -> SolutionUtils.formatMinutes(t, false)).collect(Collectors.toList()));
+
+        String format = elapsed + " [" + phases + "]";
+        return format.replace(" []", "");
+    }
 }

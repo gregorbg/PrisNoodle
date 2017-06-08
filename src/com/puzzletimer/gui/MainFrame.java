@@ -109,7 +109,6 @@ public class MainFrame extends JFrame {
         private JTextField textFieldTime;
         private HandImage rightHand;
         private boolean currentManualInput;
-        private boolean hideRunningTime;
         private long time;
 
         public TimerPanel(TimerManager timerManager) {
@@ -173,7 +172,7 @@ public class MainFrame extends JFrame {
                     TimerPanel.this.time = timing.getElapsedTime();
                     TimerPanel.this.timeLabel.setForeground(Color.BLACK);
                     TimerPanel.this.timeLabel.setText(
-							TimerPanel.this.hideRunningTime
+							MainFrame.this.timerManager.isHideRunningTime()
 									? i18n("timer_panel.running")
 									: SolutionUtils.formatMinutes(TimerPanel.this.time, false)
 					);
@@ -212,7 +211,6 @@ public class MainFrame extends JFrame {
             add(this.rightHand, "grow");
 
             this.currentManualInput = false;
-            this.hideRunningTime = MainFrame.this.configurationManager.getBooleanConfiguration("HIDE-RUNNING-TIME");
 
             this.updateTimer(MainFrame.this.configurationManager.getConfiguration("TIMER-TRIGGER").equals("MANUAL-INPUT"));
         }
@@ -238,15 +236,6 @@ public class MainFrame extends JFrame {
                 this.currentManualInput = true;
             }
         }
-
-        private void setHideRunningTime(boolean hideRunningTime) {
-			this.hideRunningTime = hideRunningTime;
-			MainFrame.this.configurationManager.setBooleanConfiguration("HIDE-RUNNING-TIME", hideRunningTime);
-		}
-
-		private boolean isHideRunningTime() {
-        	return this.hideRunningTime;
-		}
     }
 
     private class TimesScrollPane extends JScrollPane {
@@ -289,10 +278,7 @@ public class MainFrame extends JFrame {
                 labelIndex.setFont(new Font("Tahoma", Font.BOLD, 13));
                 this.panel.add(labelIndex);
 
-                String elapsed = SolutionUtils.formatMinutes(solution.getTiming().getElapsedTime(), false);
-                String phases = String.join("/", solution.getTiming().getElapsedPhases().stream().map(t -> SolutionUtils.formatMinutes(t, false)).collect(Collectors.toList()));
-                String timing = elapsed + " [" + phases + "]";
-                JLabel labelTime = new JLabel(timing.replace(" []", ""));
+                JLabel labelTime = new JLabel(solution.getTiming().toFormatString());
                 labelTime.setFont(new Font("Tahoma", Font.PLAIN, 13));
                 this.panel.add(labelTime);
 
@@ -908,9 +894,8 @@ public class MainFrame extends JFrame {
         this.menuItemInspectionTime.addActionListener(e -> MainFrame.this.timerManager.setInspectionEnabled(MainFrame.this.menuItemInspectionTime.isSelected()));
 
 		// menuItemHideRunningTime
-		// TODO move/delegate to timerManager
-		this.menuItemHideRunningTime.setSelected(this.timerPanel.isHideRunningTime());
-		this.menuItemHideRunningTime.addActionListener(e -> MainFrame.this.timerPanel.setHideRunningTime(MainFrame.this.menuItemHideRunningTime.isSelected()));
+		this.menuItemHideRunningTime.setSelected(timerManager.isHideRunningTime());
+		this.menuItemHideRunningTime.addActionListener(e -> MainFrame.this.timerManager.setHideRunningTime(MainFrame.this.menuItemHideRunningTime.isSelected()));
 
 		// menuItemInspectionTime
 		this.menuItemPhases.setSelected(timerManager.isPhasesEnabled());
