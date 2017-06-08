@@ -55,7 +55,7 @@ public class CategoryEditorDialog extends JDialog {
 
         this.checkBoxBldMode.setSelected(category.isForceStart());
 
-        this.spinnerPhases.setValue(category.getPhases() + 1);
+        this.spinnerPhases.setValue(category.getPhases());
 
         // fill combo boxes on puzzle selection
         this.comboBoxPuzzle.addActionListener(event -> {
