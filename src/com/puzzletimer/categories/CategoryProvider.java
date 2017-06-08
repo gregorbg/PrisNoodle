@@ -26,15 +26,15 @@ public class CategoryProvider {
                         "RUBIKS-CUBE-CLASSIC-POCHMANN-CORNERS",
                         "RUBIKS-CUBE-CLASSIC-POCHMANN-EDGES",
                         "RUBIKS-CUBE-M2-EDGES"
-                }, 'B', 'B', false, true, false),
+                }, 'B', 'B', 2, false, true, false),
                 new WcaCategory(UUID.fromString("761088a1-64fc-47db-92ea-b6c3b812e6f3"), "333", i18n("category.rubiks_cube_with_feet"), new String[]{
                         "RUBIKS-CUBE-OPTIMAL-CROSS",
                         "RUBIKS-CUBE-OPTIMAL-X-CROSS"
                 }, 'F', 'F', false),
                 new WcaCategory(UUID.fromString("3577f24a-065b-4bcc-9ca3-3df011d07a5d"), "444", i18n("category.4x4x4_cube"), new String[0], '4', '4', false),
-                new WcaCategory(UUID.fromString("587d884a-b996-4cd6-95bb-c3dafbfae193"), "444ni", i18n("category.4x4x4_cube_blindfolded"), new String[0], 'B', '4', true, true, false),
+                new WcaCategory(UUID.fromString("587d884a-b996-4cd6-95bb-c3dafbfae193"), "444ni", i18n("category.4x4x4_cube_blindfolded"), new String[0], 'B', '4', 2, true, true, false),
                 new WcaCategory(UUID.fromString("e3894e40-fb85-497b-a592-c81703901a95"), "555", i18n("category.5x5x5_cube"), new String[0], '5', '5', false),
-                new WcaCategory(UUID.fromString("0701c98c-a275-4e51-888c-59dc9de9de1a"), "555ni", i18n("category.5x5x5_cube_blindfolded"), new String[0], 'B', '5', true, true, false),
+                new WcaCategory(UUID.fromString("0701c98c-a275-4e51-888c-59dc9de9de1a"), "555ni", i18n("category.5x5x5_cube_blindfolded"), new String[0], 'B', '5', 2, true, true, false),
                 new WcaCategory(UUID.fromString("86227762-6249-4417-840b-3c8ba7b0bd33"), "666", i18n("category.6x6x6_cube"), new String[0], '6', '6', false),
                 new WcaCategory(UUID.fromString("b9375ece-5a31-4dc4-b58e-ecb8a638e102"), "777", i18n("category.7x7x7_cube"), new String[0], '7', '7', false),
                 new WcaCategory(UUID.fromString("7f244648-0e14-44cd-8399-b41ccdb6d7db"), "clock", i18n("category.rubiks_clock"), new String[0], 'C', 'K', false),

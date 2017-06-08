@@ -19,11 +19,12 @@ public class ControlKeysTimer implements Timer {
         READY,
         RUNNING,
         FINISHED,
-    };
+    }
 
     private JFrame frame;
     private TimerManager timerManager;
     private boolean inspectionEnabled;
+    private boolean phasesEnabled;
     private boolean leftPressed;
     private boolean rightPressed;
     private KeyListener keyListener;
@@ -31,23 +32,24 @@ public class ControlKeysTimer implements Timer {
     private java.util.Timer repeater;
     private Date start;
     private Date finish;
-    private List<Date> phaseStamps;
+    private List<Date> currentPhaseStamps;
     private State state;
-    private int phase;
+    private int currentPhase;
     private int phaseTotal;
 
     public ControlKeysTimer(JFrame frame, TimerManager timerManager) {
         this.frame = frame;
         this.timerManager = timerManager;
         this.inspectionEnabled = false;
+        this.phasesEnabled = false;
         this.leftPressed = false;
         this.rightPressed = false;
         this.repeater = null;
         this.start = null;
         this.finish = new Date(0);
-        this.phaseStamps = new ArrayList<>();
+        this.currentPhaseStamps = new ArrayList<>();
         this.state = State.NOT_READY;
-        this.phase = 0;
+        this.currentPhase = 0;
         this.phaseTotal = 1;
     }
 
@@ -72,11 +74,19 @@ public class ControlKeysTimer implements Timer {
     }
 
     @Override
-    public void setMemoSplitEnabled(boolean memoSplitEnabled) {
-		this.phaseTotal = memoSplitEnabled ? 2 : 1;
+    public void setPhasesEnabled(boolean phasesEnabled) {
+		this.phasesEnabled = phasesEnabled;
 
-		this.phase = 0;
-		this.phaseStamps.clear();
+		this.currentPhase = 0;
+		this.currentPhaseStamps.clear();
+    }
+
+    @Override
+    public void setPhaseTotal(int phaseTotal) {
+        this.phaseTotal = phaseTotal;
+
+        this.currentPhase = 0;
+        this.currentPhaseStamps.clear();
     }
 
     @Override
@@ -102,7 +112,7 @@ public class ControlKeysTimer implements Timer {
 
                 switch (ControlKeysTimer.this.state) {
                     case READY_FOR_INSPECTION:
-                        if (new Date().getTime() - ControlKeysTimer.this.finish.getTime() < 250) {
+                        if (new Date().getTime() - ControlKeysTimer.this.finish.getTime() < 350) {
                             break;
                         }
 
@@ -126,21 +136,21 @@ public class ControlKeysTimer implements Timer {
                                 break;
                             }
 
-                            ControlKeysTimer.this.phase++;
+                            ControlKeysTimer.this.currentPhase++;
 
-                            if (ControlKeysTimer.this.phase == ControlKeysTimer.this.phaseTotal) {
+                            if (!ControlKeysTimer.this.phasesEnabled || ControlKeysTimer.this.currentPhase == ControlKeysTimer.this.phaseTotal) {
 								ControlKeysTimer.this.repeater.cancel();
 
 								ControlKeysTimer.this.timerManager.finishSolution(
-										new Timing(ControlKeysTimer.this.start, ControlKeysTimer.this.finish, ControlKeysTimer.this.phaseStamps)
+										new Timing(ControlKeysTimer.this.start, ControlKeysTimer.this.finish, ControlKeysTimer.this.currentPhaseStamps)
 								);
 
-								ControlKeysTimer.this.phase = 0;
-								ControlKeysTimer.this.phaseStamps.clear();
+								ControlKeysTimer.this.currentPhase = 0;
+								ControlKeysTimer.this.currentPhaseStamps.clear();
 
 								ControlKeysTimer.this.state = State.FINISHED;
 							} else {
-                            	ControlKeysTimer.this.phaseStamps.add(ControlKeysTimer.this.finish);
+                            	ControlKeysTimer.this.currentPhaseStamps.add(ControlKeysTimer.this.finish);
 							}
                         }
                         break;
@@ -167,7 +177,7 @@ public class ControlKeysTimer implements Timer {
 
                 switch (ControlKeysTimer.this.state) {
                     case READY:
-                        if (new Date().getTime() - ControlKeysTimer.this.finish.getTime() < 250) {
+                        if (new Date().getTime() - ControlKeysTimer.this.finish.getTime() < 350) {
                             break;
                         }
 

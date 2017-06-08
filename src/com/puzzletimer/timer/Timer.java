@@ -5,9 +5,11 @@ public interface Timer {
 
     void setInspectionEnabled(boolean inspectionEnabled);
 
-    void setMemoSplitEnabled(boolean memoSplitEnabled);
-
     void setSmoothTimingEnabled(boolean smoothTimingEnabled);
+
+    void setPhasesEnabled(boolean phasesEnabled);
+
+    void setPhaseTotal(int phaseTotal);
 
     void start();
 

@@ -84,7 +84,7 @@ public class CategoryDAO {
             categoryStatement.setString(2, category.getCategoryId().toString());
             categoryStatement.setString(3, category.getScramblerId());
             categoryStatement.setString(4, category.getDescription());
-            categoryStatement.setBoolean(5, category.isBldMode());
+            categoryStatement.setBoolean(5, category.isForceStart());
 
             categoryStatement.executeUpdate();
 
@@ -135,7 +135,7 @@ public class CategoryDAO {
 
             categoryStatement.setString(1, category.getScramblerId());
             categoryStatement.setString(2, category.getDescription());
-            categoryStatement.setBoolean(3, category.isBldMode());
+            categoryStatement.setBoolean(3, category.isForceStart());
             categoryStatement.setString(4, category.getCategoryId().toString());
 
             categoryStatement.executeUpdate();

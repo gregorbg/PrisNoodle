@@ -18,6 +18,7 @@ public class CategoryEditorDialog extends JDialog {
     private JComboBox<Puzzle> comboBoxPuzzle;
     private JComboBox<Scrambler> comboBoxScrambler;
     private JCheckBox checkBoxBldMode;
+    private JSpinner spinnerPhases;
     private JComboBox<Tip> comboBoxTips;
     private JButton buttonAdd;
     private JList<Tip> listTips;
@@ -52,7 +53,9 @@ public class CategoryEditorDialog extends JDialog {
             this.comboBoxPuzzle.addItem(puzzle);
         }
 
-        this.checkBoxBldMode.setSelected(category.isBldMode());
+        this.checkBoxBldMode.setSelected(category.isForceStart());
+
+        this.spinnerPhases.setValue(category.getPhases() + 1);
 
         // fill combo boxes on puzzle selection
         this.comboBoxPuzzle.addActionListener(event -> {
@@ -163,6 +166,8 @@ public class CategoryEditorDialog extends JDialog {
             // bld mode
             boolean isBldMode = CategoryEditorDialog.this.checkBoxBldMode.isSelected();
 
+            int phases = (Integer) CategoryEditorDialog.this.spinnerPhases.getValue();
+
             // tip ids
             ListModel listModel = CategoryEditorDialog.this.listTips.getModel();
 
@@ -176,7 +181,8 @@ public class CategoryEditorDialog extends JDialog {
                             .setScramblerId(scramblerId)
                             .setDescription(description)
                             .setTipIds(tipIds)
-                            .setBldMode(isBldMode));
+                            .setForceStart(isBldMode)
+							.setPhases(phases));
 
             dispose();
         });
@@ -222,7 +228,7 @@ public class CategoryEditorDialog extends JDialog {
                 new MigLayout(
                         "fill",
                         "[pref!][fill][pref!]",
-                        "[pref!]8[pref!]8[pref!]8[pref!][grow]16[pref!]"));
+                        "[pref!]8[pref!]8[pref!]8[pref!]8[pref!][grow]16[pref!]"));
 
         add(new JLabel(i18n("category_editor.description")));
 
@@ -244,11 +250,17 @@ public class CategoryEditorDialog extends JDialog {
 
         add(new JLabel(i18n("category_editor.force_start")));
 
-        // comboBoxScrambler
+        // comboBoxBldMode
         this.checkBoxBldMode = new JCheckBox();
         add(this.checkBoxBldMode, "span 2, wrap");
 
-        add(new JLabel(i18n("category_editor.tips")));
+        add(new JLabel(i18n("category_editor.phase_count")));
+
+		// spinnerPhases
+		this.spinnerPhases = new JSpinner(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
+		add(this.spinnerPhases, "span 2, wrap");
+
+		add(new JLabel(i18n("category_editor.tips")));
 
         // comboBoxTips
         this.comboBoxTips = new JComboBox<>();

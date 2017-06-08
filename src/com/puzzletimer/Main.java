@@ -159,8 +159,8 @@ public class Main {
             public void currentCategoryChanged(Category oldCategory, Category newCategory) {
                 Main.this.configurationManager.setConfiguration("CURRENT-CATEGORY", newCategory.getCategoryId().toString());
 
-                Main.this.timerManager.getTimer().setInspectionEnabled(Main.this.timerManager.isInspectionEnabled() && !newCategory.isBldMode());
-                Main.this.timerManager.getTimer().setMemoSplitEnabled(Main.this.timerManager.isMemoSplitEnabled() && newCategory.isBldMode());
+                Main.this.timerManager.getTimer().setInspectionEnabled(Main.this.timerManager.isInspectionEnabled() && !newCategory.isForceStart());
+                Main.this.timerManager.getTimer().setPhaseTotal(newCategory.getPhases());
 
                 try {
                     Main.this.solutionManager.loadSolutions(
@@ -209,8 +209,8 @@ public class Main {
 
         // timer manager
         this.timerManager = new TimerManager();
-        this.timerManager.setInspectionEnabled(this.configurationManager.getBooleanConfiguration("INSPECTION-TIME-ENABLED"), this.categoryManager.getCurrentCategory().isBldMode());
-        this.timerManager.setMemoSplitEnabled(this.configurationManager.getBooleanConfiguration("MEMO-SPLIT-ENABLED"));
+        this.timerManager.setInspectionEnabled(this.configurationManager.getBooleanConfiguration("INSPECTION-TIME-ENABLED"));
+        this.timerManager.setPhasesEnabled(this.configurationManager.getBooleanConfiguration("PHASES-ENABLED"));
         this.timerManager.setSmoothTimingEnabled(this.configurationManager.getBooleanConfiguration("SMOOTH-TIMING-ENABLED"));
         this.timerManager.addListener(new TimerManager.Listener() {
             @Override
@@ -281,9 +281,9 @@ public class Main {
             }
 
             @Override
-            public void memoSplitEnabledSet(boolean memoSplitEnabled) {
+            public void phasesEnabledSet(boolean phasesEnabled) {
                 Main.this.configurationManager.setBooleanConfiguration(
-                        "MEMO-SPLIT-ENABLED", memoSplitEnabled);
+                        "PHASES-ENABLED", phasesEnabled);
             }
 
             @Override
