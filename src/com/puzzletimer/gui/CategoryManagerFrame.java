@@ -93,7 +93,7 @@ public class CategoryManagerFrame extends JFrame {
 
         // set add button behavior
         this.buttonAdd.addActionListener(event -> {
-            Category category = new WcaCategory(UUID.randomUUID(), "EMPTY", i18n("category_manager.new_category"), new String[0], '0', '0', false, false, true);
+            Category category = new WcaCategory(UUID.randomUUID(), "EMPTY", i18n("category_manager.new_category"), new String[0], '0', '0', 1, false, false, true);
 
             CategoryEditorListener listener = new CategoryEditorListener() {
                 @Override
