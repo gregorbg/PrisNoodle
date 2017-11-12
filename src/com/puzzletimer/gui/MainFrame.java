@@ -169,10 +169,14 @@ public class MainFrame extends JFrame {
 
                 @Override
                 public void solutionRunning(Timing timing) {
+                    // prevent StackMat baud rate from falsely spamming "running" texts
+                    // even after the timer has stopped
+                    boolean trulyRunning = TimerPanel.this.time < timing.getElapsedTime();
+
                     TimerPanel.this.time = timing.getElapsedTime();
                     TimerPanel.this.timeLabel.setForeground(Color.BLACK);
                     TimerPanel.this.timeLabel.setText(
-							MainFrame.this.timerManager.isHideRunningTime()
+							MainFrame.this.timerManager.isHideRunningTime() && trulyRunning
 									? i18n("timer_panel.running")
 									: SolutionUtils.formatMinutes(TimerPanel.this.time, false)
 					);
