@@ -53,6 +53,19 @@ public class Main {
     private SessionManager sessionManager;
 
     public Main() {
+        try {
+            Class.forName("org.h2.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            JFrame frame = new JFrame();
+            JOptionPane.showMessageDialog(
+                    frame,
+                    String.format(i18n("main.database_error_message"), e.getMessage()),
+                    i18n("main.prisma_puzzle_timer"),
+                    JOptionPane.ERROR_MESSAGE);
+            System.exit(0);
+        }
+
         // create initial database if necessary
         File databaseFile = new File("puzzletimerWCA.mv.db");
         if (!databaseFile.exists()) {
