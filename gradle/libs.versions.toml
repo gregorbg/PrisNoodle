@@ -1,0 +1,18 @@
+[versions]
+tnoodle = "0.19.2"
+h2 = "2.4.240"
+batik = "1.19"
+miglayout = "11.4.3"
+
+[libraries]
+tnoodle-scrambles = { module = "org.worldcubeassociation.tnoodle:lib-scrambles", version.ref = "tnoodle" }
+h2-database = { module = "com.h2database:h2", version.ref = "h2" }
+batik-transcoder = { module = "org.apache.xmlgraphics:batik-transcoder", version.ref = "batik" }
+batik-codec = { module = "org.apache.xmlgraphics:batik-codec", version.ref = "batik" }
+batik-swing = { module = "org.apache.xmlgraphics:batik-swing", version.ref = "batik" }
+miglayout-swing = { module = "com.miglayout:miglayout-swing", version.ref = "miglayout" }
+bld-analyze = { module = "com.suushiemaniac.cubing:bld-analyze", version = "3.0" }
+alglib = { module = "com.suushiemaniac.cubing:alglib", version = "2.0" }
+
+[bundles]
+batik = ["batik-transcoder", "batik-codec", "batik-swing"]

@@ -107,3 +107,9 @@ puzzletimerWCA.trace.db
 
 # META
 src/META-INF/
+
+# Ignore Gradle build output directory
+build
+
+# Ignore Kotlin plugin data
+.kotlin
